@@ -97,14 +97,13 @@ function checkStartPos() {
   if (!allCurrentRoversPos.includes('0,0')) {
     newRoverY = 0;
   } else {
-    for (let i = 0; i < roversArray.length; i += 1) {
-      let j = 0;
-      while (allCurrentRoversPos.includes(`${j},0`)) {
-        newRoverY = j + 1;
-        j += 1;
-      }
+    let j = 0;
+    while (allCurrentRoversPos.includes(`${j},0`)) {
+      newRoverY = j + 1;
+      j += 1;
     }
   }
+  allCurrentRoversPos = []; 
 }
 
 // creates rovers based on input at the browser console and attribute each direction and position
@@ -133,8 +132,6 @@ function createRovers(numRovers) {
       roversArray[i].travelLog.push(`${roversArray[i].y},${roversArray[i].x}`);
     }
   }
-  addCurrentRoversPos();
-  allCurrentRoversPos = [];
   addToBoard();
 }
 
@@ -280,27 +277,33 @@ function checkPos(roverNum, d) {
     }
   }
   futurePos = `${futurePosY},${futurePosX}`;
-  addCurrentRoversPos();
+  // checks if future position will be out of the board
   if (futurePosY >= 0 && futurePosY < 10 && futurePosX >= 0 && futurePosX < 10) {
     message = '';
   } else {
     message = `Rover ${roverNum} says: Ouch! There's a wall!`;
   }
+  // checks if there's an obstacle in future position
   if (obstaclesArray.includes(futurePos)) {
     message = `Rover ${roverNum} says: Hey! There's an obstacle here!`;
   }
+  // checks if there's another rover in future position
+  addCurrentRoversPos();
   if (allCurrentRoversPos.includes(futurePos)) {
     message = `Rover ${roverNum} says: Hey! There's another rover here!`;
   }
+  // resets allCurrentRoversPos for next iteration
   allCurrentRoversPos = [];
 }
 
 // receives and interprets commands from browser console.
 function commands(read) {
   for (let i = 0; i < read.length; i += 1) {
+    // makes command get back to first rover after the last one
     if (roverNum === roversArray.length) {
       roverNum = 0;
     }
+    // interprets commands
     switch (read[i]) {
       case 'f':
         checkPos(roverNum, 'f');
@@ -328,7 +331,9 @@ function commands(read) {
         console.log(`Invalid command (${read[i]}). Lost your turn.`);
         break;
     }
+    // adds rovers position to board
     addToBoard();
+    // goes to next rover
     roverNum += 1;
   }
 }
